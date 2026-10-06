@@ -625,6 +625,15 @@ class TenderApp {
 
       listContainer.appendChild(card);
     });
+
+    if (window.initBorderGlow) {
+      window.initBorderGlow('.file-card', {
+        borderRadius: 10,
+        glowRadius: 25,
+        edgeSensitivity: 25,
+        colors: ['#c084fc', '#f472b6', '#38bdf8']
+      });
+    }
   }
 
   getRequirementMatchedToFile(fileId) {

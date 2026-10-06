@@ -11,6 +11,7 @@
 
   <!-- Stylesheet -->
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/border-glow.css">
 
   <!-- Vendor Libraries (Vendored locally for 100% offline reliability) -->
   <script src="vendor/ogl.umd.js"></script>
@@ -395,14 +396,16 @@
 
   <!-- Core Scripts -->
   <script src="js/line-waves.js"></script>
+  <script src="js/border-glow.js"></script>
   <script src="js/translations.js"></script>
   <script src="js/state.js"></script>
   <script src="js/pdf-builder.js"></script>
   <script src="js/app.js"></script>
 
-  <!-- Initialize LineWaves Background Component with Specified Props -->
+  <!-- Initialize LineWaves & BorderGlow Components (React Bits) -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      // 1. LineWaves Animated Background
       const container = document.getElementById('lineWavesContainer');
       if (container && window.initLineWaves) {
         window.lineWavesInstance = window.initLineWaves(container, {
@@ -419,6 +422,21 @@
           color3: "#F97316",
           enableMouseInteraction: true,
           mouseInfluence: 2.0
+        });
+      }
+
+      // 2. BorderGlow for every card
+      if (window.initBorderGlow) {
+        window.initBorderGlow('.app-header, .tender-hero-card, .panel-card, .readiness-meter-box, .options-group', {
+          edgeSensitivity: 30,
+          glowColor: "40 80 80",
+          backgroundColor: document.documentElement.getAttribute('data-theme') === 'light' ? '#ffffff' : '#111827',
+          borderRadius: 16,
+          glowRadius: 40,
+          glowIntensity: 1.0,
+          coneSpread: 25,
+          animated: true,
+          colors: ['#c084fc', '#f472b6', '#38bdf8']
         });
       }
     });
