@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TenderFlow — Tender Document Package Builder</title>
+  <meta name="description" content="AI DevFest Tender Document Package Builder: Verify, match, check expiry, remove duplicates, and build compliant PDF packages for tender submissions.">
+  
+  <!-- Favicon icon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📑</text></svg>">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Vendor Libraries (Vendored locally for 100% offline reliability) -->
+  <script src="vendor/pdf-lib.min.js"></script>
+  <script src="vendor/pdf.min.js"></script>
+</head>
+<body>
+
+  <!-- Hidden File Inputs -->
+  <input type="file" id="requirementsFileInput" accept=".json" class="hidden">
+  <input type="file" id="fileUploadInput" accept=".pdf,application/pdf" multiple class="hidden">
+  <input type="file" id="projectFileInput" accept=".json,.tenderproj" class="hidden">
+  <input type="file" id="sealImageInput" accept="image/png" class="hidden">
+
+  <div class="app-container">
+
+    <!-- App Header & Navigation -->
+    <header class="app-header">
+      <div class="brand-section">
+        <div class="brand-logo-icon">📑</div>
+        <div class="brand-titles">
+          <h1>
+            <span data-i18n="appTitle">TenderFlow</span>
+            <span class="badge-tag" data-i18n="devFestBadge">AI DevFest 2026</span>
+          </h1>
+          <p data-i18n="appSubtitle">Tender Document Package Builder</p>
+        </div>
+      </div>
+
+      <div class="header-controls">
+        <!-- 1-Click Load Sample Pack -->
+        <button id="loadSampleBtn" class="btn btn-secondary btn-sm" data-i18n="loadSampleBtn" data-i18n-title="loadSampleHint">
+          ⚡ Load Sample Pack
+        </button>
+
+        <!-- Project Import / Export -->
+        <button id="importProjectBtn" class="btn btn-outline btn-sm" data-i18n="importProjectBtn">
+          📂 Open
+        </button>
+        <button id="exportProjectBtn" class="btn btn-outline btn-sm" data-i18n="exportProjectBtn">
+          💾 Save
+        </button>
+        <button id="exportCsvBtn" class="btn btn-outline btn-sm" data-i18n="exportCsvBtn">
+          📊 Export CSV
+        </button>
+
+        <!-- AI Assistant Button -->
+        <button id="aiAssistantBtn" class="btn btn-outline btn-sm" data-i18n="aiAssistantBtn">
+          🤖 AI Audit
+        </button>
+
+        <!-- Bilingual Switcher (EN / BN) -->
+        <div class="lang-switch-group">
+          <button id="langBtnEn" class="lang-btn active">English</button>
+          <button id="langBtnBn" class="lang-btn">বাংলা</button>
+        </div>
+
+        <!-- Dark / Light Theme Toggle -->
+        <button id="themeToggleBtn" class="theme-toggle-btn" title="Toggle Theme" aria-label="Toggle Theme">
+          🌙
+        </button>
+      </div>
+    </header>
+
+    <!-- Tender Information & Readiness Hero Card -->
+    <section class="tender-hero-card" aria-label="Tender Overview">
+      <div class="tender-hero-details">
+        <h2 class="panel-title" data-i18n="tenderOverviewTitle">Tender Information</h2>
+        
+        <div class="tender-meta-grid">
+          <div class="meta-item">
+            <span class="meta-label" data-i18n="tenderId">Tender ID</span>
+            <span id="dispTenderId" class="meta-value accent-id">—</span>
+          </div>
+
+          <div class="meta-item">
+            <span class="meta-label" data-i18n="submissionDeadline">Submission Deadline</span>
+            <span id="dispDeadline" class="meta-value highlight-deadline">—</span>
+          </div>
+
+          <div class="meta-item">
+            <span class="meta-label">Tender Title</span>
+            <span id="dispTenderTitle" class="meta-value">—</span>
+          </div>
+
+          <div class="meta-item">
+            <span class="meta-label" data-i18n="procuringEntity">Procuring Entity</span>
+            <span id="dispProcuringEntity" class="meta-value">—</span>
+          </div>
+
+          <div class="meta-item">
+            <span class="meta-label" data-i18n="bidder">Bidder Name</span>
+            <span id="dispBidder" class="meta-value">—</span>
+          </div>
+
+          <div class="meta-item">
+            <span class="meta-label" data-i18n="totalUploadedCount">Uploaded Files</span>
+            <span id="dispDocsCount" class="meta-value">0 Files Uploaded</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Compliance & Readiness Meter -->
+      <div class="readiness-meter-box">
+        <div class="meter-header">
+          <span data-i18n="packageReadiness">Package Readiness</span>
+          <div id="readinessPercent" class="meter-score">0%</div>
+        </div>
+
+        <div class="meter-track">
+          <div id="readinessFill" class="meter-fill"></div>
+        </div>
+
+        <div class="meter-footer">
+          <span id="readinessBadge" class="status-pill badge-missing">Action Required</span>
+          <span class="text-dim" style="font-size: 0.78rem;">
+            <span id="blockingIssuesCount">0</span> Issues Blocking
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Workspace Grid -->
+    <main class="workspace-grid">
+
+      <!-- Left Panel: Requirements Checklist Table -->
+      <section class="panel-card" aria-label="Requirements Checklist">
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>📋</span>
+            <span data-i18n="requirementsTitle">Requirements & Document Checklist</span>
+          </div>
+
+          <div class="filter-bar">
+            <button class="filter-pill active" data-filter="all" data-i18n="filterAll">All</button>
+            <button class="filter-pill" data-filter="mandatory" data-i18n="filterMandatory">Mandatory</button>
+            <button class="filter-pill" data-filter="optional" data-i18n="filterOptional">Optional</button>
+            <button class="filter-pill" data-filter="action_needed" data-i18n="filterActionNeeded">Action Needed</button>
+          </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-box">
+          <input type="text" id="reqSearchInput" class="form-input" data-i18n-ph="searchReqPlaceholder" placeholder="Search requirement by title or ID...">
+        </div>
+
+        <!-- Table Responsive Container -->
+        <div class="table-responsive">
+          <table class="req-table">
+            <thead>
+              <tr>
+                <th style="width: 55px;" data-i18n="colOrder">Order</th>
+                <th style="min-width: 170px;" data-i18n="colTitle">Document Title</th>
+                <th style="min-width: 220px;" data-i18n="colMatchedFile">Matched File</th>
+                <th style="min-width: 140px;" data-i18n="colExpiryDate">Expiry Date</th>
+                <th style="min-width: 110px;" data-i18n="colStatus">Status</th>
+              </tr>
+            </thead>
+            <tbody id="requirementsTableBody">
+              <!-- Dynamically populated rows -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Right Panel: Files Manager & Package Generator -->
+      <aside class="panel-card" aria-label="Uploads and Generator">
+
+        <div class="panel-header">
+          <div class="panel-title">
+            <span>📁</span>
+            <span data-i18n="uploadPanelTitle">Uploaded Files</span>
+            <span id="uploadedFilesCount" class="badge-tag">0</span>
+          </div>
+
+          <button id="loadReqBtn" class="btn btn-outline btn-sm" data-i18n="loadRequirementsBtn">
+            📄 Load requirements.json
+          </button>
+        </div>
+
+        <!-- Drag & Drop Zone (PDFs only) -->
+        <div id="fileDropZone" class="drop-zone" role="button" tabindex="0" aria-label="Upload PDF Files">
+          <div class="drop-icon">📤</div>
+          <div class="drop-title" data-i18n="uploadZoneText">Drag & drop PDF files here, or click to browse</div>
+          <div class="drop-subtext" data-i18n="uploadZoneSubtext">Accepts PDF files only • Max 30 files • Up to 50 MB total</div>
+          <button type="button" class="btn btn-primary btn-sm" data-i18n="browseFilesBtn">Browse PDF Files</button>
+        </div>
+
+        <!-- Quick Matching Bar -->
+        <div class="quick-tools-bar">
+          <button id="autoMatchBtn" class="btn btn-secondary btn-sm" data-i18n="smartAutoMatchBtn" data-i18n-title="smartAutoMatchTooltip">
+            ✨ Smart Auto-Match
+          </button>
+          <button id="clearMatchesBtn" class="btn btn-outline btn-sm" data-i18n="clearAllMatchesBtn">
+            ✕ Clear Matches
+          </button>
+        </div>
+
+        <!-- Uploaded Files List (with duplicate indicators) -->
+        <div id="uploadedFilesList" class="uploaded-files-scroll">
+          <!-- Dynamically populated file cards -->
+        </div>
+
+        <!-- Package Configuration Options -->
+        <div class="options-group">
+          <div class="panel-title" style="font-size: 0.95rem;" data-i18n="packageOptionsTitle">Package Configuration</div>
+
+          <!-- Bonus Task 1: Index Page -->
+          <label class="checkbox-label">
+            <input type="checkbox" id="optIndexPage" checked>
+            <div class="checkbox-label-text">
+              <span data-i18n="optIncludeIndex">Include Table of Contents / Index page after cover</span>
+              <span class="checkbox-subtext" data-i18n="optIncludeIndexHint">Lists all included documents with their starting page numbers</span>
+            </div>
+          </label>
+
+          <!-- Bonus Task 5: Bangla Cover & Index -->
+          <label class="checkbox-label">
+            <input type="checkbox" id="optBanglaCover">
+            <div class="checkbox-label-text">
+              <span data-i18n="optBanglaCoverIndex">Render Cover & Index in Bangla</span>
+              <span class="checkbox-subtext" data-i18n="optBanglaCoverIndexHint">Applies high-DPI Bengali typography on cover and index pages</span>
+            </div>
+          </label>
+
+          <!-- Bonus Task 2: Official Seal / Signature -->
+          <label class="checkbox-label">
+            <input type="checkbox" id="optSealToggle">
+            <div class="checkbox-label-text">
+              <span data-i18n="optEnableSeal">Stamp official seal / signature PNG</span>
+              <span class="checkbox-subtext" data-i18n="optEnableSealHint">Digitally place company seal or authorized signature on document pages</span>
+            </div>
+          </label>
+
+          <!-- Seal Sub-config (collapsible) -->
+          <div id="sealConfigPanel" class="seal-config-grid hidden">
+            <div>
+              <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('sealImageInput').click();">
+                🖋️ Upload PNG Seal
+              </button>
+              <img id="sealThumbPreview" class="seal-thumb-img hidden" alt="Seal Preview">
+            </div>
+
+            <div>
+              <label style="font-size: 0.75rem; color: var(--text-dim);" data-i18n="sealPlacementTarget">Place On:</label>
+              <select id="sealTargetSelect" class="form-select">
+                <option value="docs_only" data-i18n="sealTargetDocsOnly">All Documents (Exclude Cover)</option>
+                <option value="all" data-i18n="sealTargetAll">All Document Pages</option>
+                <option value="cover_only" data-i18n="sealTargetCoverOnly">Cover Page Only</option>
+                <option value="last_only" data-i18n="sealTargetLastOnly">Last Page Only</option>
+              </select>
+            </div>
+
+            <div>
+              <label style="font-size: 0.75rem; color: var(--text-dim);" data-i18n="sealPosition">Position:</label>
+              <select id="sealPosSelect" class="form-select">
+                <option value="bottom-right" data-i18n="posBottomRight">Bottom Right</option>
+                <option value="bottom-left" data-i18n="posBottomLeft">Bottom Left</option>
+                <option value="top-right" data-i18n="posTopRight">Top Right</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Blocking Issues Checklist (Rule 4.7) -->
+        <div id="blockingIssuesAlert" class="alert-box alert-danger">
+          <strong id="blockingTitle" style="font-size: 0.9rem;" data-i18n="blockingIssuesTitle">
+            Cannot Generate: Blocking Issues Found
+          </strong>
+          <ul id="blockingIssuesList" class="blocking-list">
+            <!-- Dynamic blocking issue items -->
+          </ul>
+        </div>
+
+        <!-- Ready to Generate Banner -->
+        <div id="readyToGenerateAlert" class="alert-box alert-success hidden">
+          <strong style="font-size: 0.9rem;">✅ Ready for Package Generation!</strong>
+          <p style="font-size: 0.8rem;" data-i18n="readyToGenerateBanner">
+            All requirements met! You can now generate the official submission package.
+          </p>
+        </div>
+
+        <!-- Package Generator Buttons -->
+        <div class="generator-box">
+          <button id="generatePackageBtn" class="btn btn-primary btn-generate disabled" disabled data-i18n="generateBtn">
+            ⚡ Generate Combined Tender Package
+          </button>
+
+          <div class="generator-results-actions">
+            <button id="downloadPackageBtn" class="btn btn-success hidden">
+              📥 Download Package
+            </button>
+            <button id="previewPackageBtn" class="btn btn-outline hidden" data-i18n="previewPackageBtn">
+              👁️ Preview Generated PDF
+            </button>
+          </div>
+
+          <div id="generatedTotalPages" class="text-dim" style="font-size: 0.8rem; text-align: center;"></div>
+        </div>
+
+      </aside>
+
+    </main>
+
+  </div>
+
+  <!-- PDF Preview Modal -->
+  <div id="pdfPreviewModal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span>📄</span>
+          <span id="previewModalDocTitle" data-i18n="previewModalTitle">Document Preview</span>
+        </div>
+        <button class="btn-icon modal-close" aria-label="Close Preview">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="pdf-viewer-controls">
+          <div>
+            <button id="previewPrevBtn" class="btn btn-secondary btn-sm" data-i18n="prevPage">Previous</button>
+            <span id="previewPageIndicator" style="margin: 0 0.75rem; font-size: 0.85rem; font-weight: 600;">Page 1 of 1</span>
+            <button id="previewNextBtn" class="btn btn-secondary btn-sm" data-i18n="nextPage">Next</button>
+          </div>
+
+          <div>
+            <button id="previewZoomOutBtn" class="btn btn-secondary btn-sm" data-i18n="zoomOut">−</button>
+            <button id="previewZoomInBtn" class="btn btn-secondary btn-sm" data-i18n="zoomIn">+</button>
+          </div>
+        </div>
+
+        <div class="canvas-viewport">
+          <canvas id="pdfPreviewCanvas"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Assistant Modal (Bonus Task 8) -->
+  <div id="aiAssistantModal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">
+          <span>🤖</span>
+          <span data-i18n="aiModalTitle">AI Tender Compliance Assistant</span>
+        </div>
+        <button class="btn-icon modal-close" aria-label="Close Assistant">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div>
+          <label style="font-size: 0.82rem; font-weight: 600; color: var(--text-muted);" data-i18n="aiApiKeyLabel">
+            Google Gemini / OpenAI API Key (Optional):
+          </label>
+          <input type="password" id="aiApiKeyInput" class="form-input" data-i18n-ph="aiApiKeyPlaceholder" placeholder="Enter personal API key (stored locally only)">
+        </div>
+
+        <div class="ai-actions-row">
+          <button id="aiAuditBtn" class="btn btn-primary btn-sm" data-i18n="aiCheckComplianceBtn">
+            📋 Run Compliance Audit
+          </button>
+          <button id="aiExpiryBtn" class="btn btn-secondary btn-sm" data-i18n="aiAnalyzeExpiryBtn">
+            ⏳ Analyze Expiry Risks
+          </button>
+          <button id="aiSummaryBtn" class="btn btn-outline btn-sm" data-i18n="aiGenerateSummaryBtn">
+            📝 Generate Bid Summary
+          </button>
+        </div>
+
+        <div id="aiAuditOutput">
+          <!-- Dynamically populated AI reports -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" aria-live="polite"></div>
+
+  <!-- Core Scripts -->
+  <script src="js/translations.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/pdf-builder.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
