@@ -13,10 +13,14 @@
   <link rel="stylesheet" href="css/style.css">
 
   <!-- Vendor Libraries (Vendored locally for 100% offline reliability) -->
+  <script src="vendor/ogl.umd.js"></script>
   <script src="vendor/pdf-lib.min.js"></script>
   <script src="vendor/pdf.min.js"></script>
 </head>
 <body>
+
+  <!-- LineWaves Animated Background (React Bits) -->
+  <div id="lineWavesContainer" class="line-waves-container"></div>
 
   <!-- Hidden File Inputs -->
   <input type="file" id="requirementsFileInput" accept=".json" class="hidden">
@@ -390,9 +394,34 @@
   <div id="toastContainer" aria-live="polite"></div>
 
   <!-- Core Scripts -->
+  <script src="js/line-waves.js"></script>
   <script src="js/translations.js"></script>
   <script src="js/state.js"></script>
   <script src="js/pdf-builder.js"></script>
   <script src="js/app.js"></script>
+
+  <!-- Initialize LineWaves Background Component with Specified Props -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const container = document.getElementById('lineWavesContainer');
+      if (container && window.initLineWaves) {
+        window.lineWavesInstance = window.initLineWaves(container, {
+          speed: 0.3,
+          innerLineCount: 32,
+          outerLineCount: 36,
+          warpIntensity: 1.0,
+          rotation: -45,
+          edgeFadeWidth: 0.0,
+          colorCycleSpeed: 1.0,
+          brightness: 0.2,
+          color1: "#10B981",
+          color2: "#0061ff",
+          color3: "#F97316",
+          enableMouseInteraction: true,
+          mouseInfluence: 2.0
+        });
+      }
+    });
+  </script>
 </body>
 </html>
