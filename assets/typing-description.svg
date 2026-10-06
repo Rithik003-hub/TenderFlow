@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 110" width="100%" height="110">
+  <defs>
+    <linearGradient id="cardBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" stop-opacity="0.95"/>
+      <stop offset="50%" stop-color="#111827" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#020617" stop-opacity="0.98"/>
+    </linearGradient>
+
+    <linearGradient id="borderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="50%" stop-color="#818cf8"/>
+      <stop offset="100%" stop-color="#c084fc"/>
+    </linearGradient>
+
+    <linearGradient id="textGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="70%" stop-color="#e2e8f0"/>
+      <stop offset="100%" stop-color="#38bdf8"/>
+    </linearGradient>
+
+    <linearGradient id="textGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="35%" stop-color="#818cf8"/>
+      <stop offset="70%" stop-color="#a78bfa"/>
+      <stop offset="100%" stop-color="#34d399"/>
+    </linearGradient>
+
+    <!-- Clip path for typewriter reveal on line 1 -->
+    <clipPath id="typewriterClip1">
+      <rect x="36" y="24" width="0" height="34">
+        <animate attributeName="width" from="0" to="800" dur="2.8s" begin="0.2s" fill="freeze" calcMode="spline" keySplines="0.1 0.8 0.2 1" keyTimes="0;1"/>
+      </rect>
+    </clipPath>
+
+    <!-- Clip path for typewriter reveal on line 2 -->
+    <clipPath id="typewriterClip2">
+      <rect x="36" y="62" width="0" height="32">
+        <animate attributeName="width" from="0" to="800" dur="2.4s" begin="1.8s" fill="freeze" calcMode="spline" keySplines="0.1 0.8 0.2 1" keyTimes="0;1"/>
+      </rect>
+    </clipPath>
+  </defs>
+
+  <style>
+    @keyframes cursorBlink {
+      0%, 45% { opacity: 1; }
+      50%, 100% { opacity: 0; }
+    }
+    @keyframes subtlePulse {
+      0%, 100% { stroke-opacity: 0.6; }
+      50% { stroke-opacity: 1; filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.4)); }
+    }
+    .cursor-line1 {
+      animation: cursorBlink 0.9s infinite;
+    }
+    .container-rect {
+      animation: subtlePulse 4s infinite ease-in-out;
+    }
+  </style>
+
+  <!-- Container Box -->
+  <rect x="2" y="2" width="876" height="106" rx="14" fill="url(#cardBg)" stroke="url(#borderGrad)" stroke-width="1.5" class="container-rect"/>
+
+  <!-- Left accent indicator icon -->
+  <circle cx="22" cy="22" r="4.5" fill="#38bdf8"/>
+  <circle cx="36" cy="22" r="4.5" fill="#818cf8"/>
+  <circle cx="50" cy="22" r="4.5" fill="#34d399"/>
+
+  <!-- Line 1: Typewritten Main Description -->
+  <g clip-path="url(#typewriterClip1)">
+    <text x="36" y="48" font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif" font-size="17" font-weight="600" fill="url(#textGrad1)">
+      ⚡ Turn individual PDF files into a verified, ordered, and compliant tender submission package.
+    </text>
+  </g>
+
+  <!-- Line 2: Typewritten Sub-Features -->
+  <g clip-path="url(#typewriterClip2)">
+    <text x="36" y="84" font-family="'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif" font-size="14.5" font-weight="500" fill="url(#textGrad2)">
+      🛡️ 100% Client-Side Engine • Automated SHA-256 Duplicate Blocker • Expiry Sentinel • 1-Click PDF Compiler
+    </text>
+  </g>
+
+  <!-- Glowing Blinking Cursor -->
+  <rect x="790" y="32" width="2.5" height="20" fill="#38bdf8" class="cursor-line1" rx="1"/>
+</svg>

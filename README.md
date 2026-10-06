@@ -1,5 +1,9 @@
 # TenderFlow — Tender Document Package Builder
 
+<p align="center">
+  <img src="assets/typing-description.svg" alt="TenderFlow Overview Animation" width="100%" />
+</p>
+
 > **AI DevFest Contest Submission**  
 > An enterprise-grade, frontend-only web application that turns individual PDF files into a verified, ordered, and compliant tender submission package ready for submission.
 
@@ -109,3 +113,35 @@ You can also open `index.html` directly in modern Google Chrome.
 - [x] **6.2 Document Order**: Included documents strictly sorted by `order`. Unprovided optional documents skipped.
 - [x] **6.3 Universal Footer**: Every page contains `<tender_id> | Page X of Y` (Page 1 of 17, Page 2 of 17, ... Page 17 of 17).
 - [x] **6.4 Non-overlapping Layout**: Footers rendered with a neat baseline bar and clean typography to guarantee readability without obscuring document contents.
+
+---
+
+## 🏆 End Credits & Acknowledgments
+
+<div align="center">
+
+### Built with ❤️ and precision by **[Rithik](https://github.com/Rithik003-hub)**
+
+<p align="center">
+  <a href="https://github.com/Rithik003-hub/TenderFlow">
+    <img src="assets/waving-hand.svg" alt="Waving Hand Animation" width="75" height="75" />
+  </a>
+</p>
+
+<p align="center">
+  <strong>Thank you for exploring TenderFlow! 👋</strong><br/>
+  <em>Turning tedious tender documentation into a fast, verified, and delightful experience.</em>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Developer-Rithik003--hub-6366F1?style=for-the-badge&logo=github" alt="Developer" />
+  <img src="https://img.shields.io/badge/AI%20DevFest-2026-10B981?style=for-the-badge" alt="AI DevFest 2026" />
+  <img src="https://img.shields.io/badge/Stack-Vanilla%20JS%20%7C%20CSS%20Glass%20%7C%20PDF--Lib-0284C7?style=for-the-badge" alt="Stack" />
+  <img src="https://img.shields.io/badge/UI-React%20Bits%20Pro-F43F5E?style=for-the-badge" alt="UI" />
+</p>
+
+<p align="center">
+  <sub>Designed & engineered for 100% offline security, zero data leakage, and strict procurement compliance.</sub>
+</p>
+
+</div>
