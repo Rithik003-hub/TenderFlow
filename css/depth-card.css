@@ -1,0 +1,138 @@
+/* ==========================================================================
+   Depth Card - React Bits Pro Component CSS
+   Perspective 3D depth effect responding to mouse movement with spotlight & glare
+   ========================================================================== */
+
+.depth-card {
+  --depth-perspective: 1000px;
+  --depth-rotate-x: 0deg;
+  --depth-rotate-y: 0deg;
+  --depth-translate-x: 0px;
+  --depth-translate-y: 0px;
+  --depth-scale: 1;
+  --depth-spotlight-color: rgba(255, 255, 255, 0.12);
+  --depth-spotlight-x: 50%;
+  --depth-spotlight-y: 50%;
+  --depth-glare-angle: 135deg;
+  --depth-glare-opacity: 0;
+
+  position: relative;
+  transform-style: preserve-3d;
+  will-change: transform, box-shadow;
+  transform: perspective(var(--depth-perspective))
+             rotateX(var(--depth-rotate-x))
+             rotateY(var(--depth-rotate-y))
+             translate3d(var(--depth-translate-x), var(--depth-translate-y), 0px)
+             scale3d(var(--depth-scale), var(--depth-scale), 1);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Light mode spotlight color override */
+[data-theme="light"] .depth-card {
+  --depth-spotlight-color: rgba(99, 102, 241, 0.08);
+}
+
+/* Active moving state: disable CSS transition during mouse tracking for buttery 60/120fps RAF lerp */
+.depth-card.depth-active {
+  transition: none !important;
+}
+
+/* Inner Spotlight overlay layer (follows cursor position) */
+.depth-card-spotlight {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+  background: radial-gradient(
+    circle 320px at var(--depth-spotlight-x) var(--depth-spotlight-y),
+    var(--depth-spotlight-color) 0%,
+    rgba(255, 255, 255, 0) 80%
+  );
+  mix-blend-mode: plus-lighter;
+}
+
+[data-theme="light"] .depth-card-spotlight {
+  mix-blend-mode: multiply;
+  background: radial-gradient(
+    circle 320px at var(--depth-spotlight-x) var(--depth-spotlight-y),
+    rgba(99, 102, 241, 0.09) 0%,
+    rgba(255, 255, 255, 0) 75%
+  );
+}
+
+.depth-card:hover .depth-card-spotlight,
+.depth-card.depth-active .depth-card-spotlight {
+  opacity: 1;
+}
+
+/* Inner Glare / Specular Sheen layer (shifts dynamically across surface) */
+.depth-card-glare {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 2;
+  opacity: var(--depth-glare-opacity, 0);
+  transition: opacity 0.35s ease;
+  background: linear-gradient(
+    var(--depth-glare-angle, 135deg),
+    rgba(255, 255, 255, 0.18) 0%,
+    rgba(255, 255, 255, 0.03) 40%,
+    transparent 80%
+  );
+  mix-blend-mode: overlay;
+}
+
+[data-theme="light"] .depth-card-glare {
+  background: linear-gradient(
+    var(--depth-glare-angle, 135deg),
+    rgba(255, 255, 255, 0.5) 0%,
+    rgba(255, 255, 255, 0.1) 40%,
+    transparent 80%
+  );
+}
+
+/* 3D Depth Parallax Layers for internal child elements */
+.depth-card .depth-layer {
+  transform: translateZ(16px);
+  transform-style: preserve-3d;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.depth-card .depth-layer-pop {
+  transform: translateZ(28px);
+  transform-style: preserve-3d;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Ensure interactive controls remain fully clickable & accessible above 3D planes */
+.depth-card button,
+.depth-card input,
+.depth-card select,
+.depth-card a,
+.depth-card label,
+.depth-card .btn,
+.depth-card .btn-icon,
+.depth-card .filter-pill,
+.depth-card .form-input,
+.depth-card .form-select {
+  position: relative;
+  z-index: 10;
+  pointer-events: auto;
+}
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .depth-card {
+    transform: none !important;
+    transition: none !important;
+  }
+  .depth-card-spotlight,
+  .depth-card-glare {
+    display: none !important;
+  }
+}

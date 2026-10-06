@@ -598,8 +598,8 @@ class TenderApp {
 
       card.innerHTML = `
         <div class="file-card-left">
-          <div class="file-icon-box">📄</div>
-          <div class="file-meta">
+          <div class="file-icon-box depth-layer-pop">📄</div>
+          <div class="file-meta depth-layer">
             <div class="file-name" title="${fileObj.name}">${fileObj.name}</div>
             <div class="file-sub-info">
               <span>${fileObj.pageCount} ${this.t('fileItemPages')}</span>
@@ -632,6 +632,19 @@ class TenderApp {
         glowRadius: 25,
         edgeSensitivity: 25,
         colors: ['#c084fc', '#f472b6', '#38bdf8']
+      });
+    }
+
+    if (window.initDepthCard) {
+      window.initDepthCard('.file-card', {
+        maxRotation: 10,
+        maxTranslation: 8,
+        perspective: 900,
+        scale: 1.02,
+        spotlight: true,
+        glare: true,
+        glareOpacity: 0.2,
+        lerpSpeed: 0.18
       });
     }
   }
