@@ -13,13 +13,23 @@
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/border-glow.css">
   <link rel="stylesheet" href="css/depth-card.css">
+  <link rel="stylesheet" href="css/ai-loader.css">
 
   <!-- Vendor Libraries (Vendored locally for 100% offline reliability) -->
   <script src="vendor/ogl.umd.js"></script>
   <script src="vendor/pdf-lib.min.js"></script>
   <script src="vendor/pdf.min.js"></script>
+  <script src="js/ai-loader.js"></script>
 </head>
 <body>
+
+  <!-- AI Loader - Page Loading Animation (triggers on load/reload) -->
+  <div id="appLoader" class="ai-loader-overlay" aria-label="Loading Application">
+    <div class="ai-loader-container">
+      <div class="ai-loader-text" id="aiLoaderText"></div>
+      <div class="ai-loader-circle"></div>
+    </div>
+  </div>
 
   <!-- LineWaves Animated Background (React Bits) -->
   <div id="lineWavesContainer" class="line-waves-container"></div>
